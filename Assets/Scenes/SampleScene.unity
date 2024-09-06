@@ -683,8 +683,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cube: {fileID: 6363350652848693088, guid: af3392ff6b97a164bbef6a6d118f1339, type: 3}
-  _spawnTime: 0.01
-  _cubesPerSpawn: 50
+  _spawnTime: 0.1
+  _cubesPerSpawn: 100
   _spawnSize: {x: 4.9, y: 0, z: 4.9}
   _poolSize: 100000
 --- !u!4 &1154600313

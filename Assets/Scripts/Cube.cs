@@ -10,6 +10,7 @@ public class Cube : MonoBehaviour
     [SerializeField] private float _maxDyingTime = 5;
     private Renderer _renderer;
     private Rigidbody _rigidbody;
+    private Coroutine _waitForDeath;
     private bool _isDying = false;
 
     public event UnityAction<Cube> Dying;
@@ -20,9 +21,21 @@ public class Cube : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (_isDying == false && collision.gameObject.TryGetComponent<CubesKiller>(out CubesKiller cubeskiller))
+        {
+            Die();
+        }
+    }
+
     public void Init()
     {
-        StopAllCoroutines();
+        if (_waitForDeath != null)
+        {
+            StopCoroutine(_waitForDeath);
+        }
+
         transform.rotation = Quaternion.Euler(Vector3.zero);
         _renderer.material.color = Color.white;
         _rigidbody.velocity = Vector3.zero;
@@ -33,7 +46,12 @@ public class Cube : MonoBehaviour
     public void Init(Vector3 position)
     {
         Init();
-        _rigidbody.position = position;
+        transform.position = position;
+    }
+
+    public void Destroy()
+    {
+        Destroy(gameObject);
     }
 
     public void SetActive(bool isActive)
@@ -41,20 +59,12 @@ public class Cube : MonoBehaviour
         gameObject.SetActive(isActive);
     }
 
-    public void Destroy()
+    private void Die()
     {
-        Dying?.Invoke(this);
-    }
-
-    public void Die()
-    {
-        if (_isDying == false)
-        {
-            _isDying = true;
-            float dyingTime = Random.Range(_minDyingTime, _maxDyingTime);
-            _renderer.material.color = Random.ColorHSV();
-            StartCoroutine(WaitForDeath(dyingTime));
-        }
+        _isDying = true;
+        float dyingTime = Random.Range(_minDyingTime, _maxDyingTime);
+        _renderer.material.color = Random.ColorHSV();
+        _waitForDeath = StartCoroutine(WaitForDeath(dyingTime));
     }
 
     private IEnumerator WaitForDeath(float time)

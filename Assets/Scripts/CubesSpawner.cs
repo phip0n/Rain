@@ -9,7 +9,6 @@ public class CubesSpawner : MonoBehaviour
     [SerializeField] private int _cubesPerSpawn;
     [SerializeField] private Vector3 _spawnSize;
     [SerializeField] private int _poolSize = 100;
-    private bool _isCreating = false;
     private ObjectPool<Cube> _cubesPool;
 
     private void Awake()
@@ -31,19 +30,9 @@ public class CubesSpawner : MonoBehaviour
 
     private void ActionOnGet(Cube cube)
     {
-        cube.SetActive(true);
-
-        if (_isCreating)
-        {
-            _isCreating = false;
-            cube.Init();
-        }
-        else
-        {
-            cube.Init(GetSpawnPosition());
-        }
-
+        cube.Init(GetSpawnPosition());
         cube.Dying += ReleaseCube;
+        cube.SetActive(true);
     }
 
     private void ActionOnRelease(Cube cube)
@@ -54,9 +43,7 @@ public class CubesSpawner : MonoBehaviour
 
     private Cube CreateCube()
     {
-        _isCreating = true;
-        Cube cube = Instantiate(_cube, GetSpawnPosition(), Quaternion.identity);
-        return cube;
+        return Instantiate(_cube, GetSpawnPosition(), Quaternion.identity);
     }
 
     private Vector3 GetSpawnPosition()
@@ -75,7 +62,7 @@ public class CubesSpawner : MonoBehaviour
     {
         WaitForSeconds time = new WaitForSeconds(_spawnTime);
 
-        while (this.enabled)
+        while (enabled)
         {
             yield return time;
 
