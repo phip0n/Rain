@@ -13,9 +13,9 @@ public class Cube : MonoBehaviour
     private Coroutine _waitForDeath;
     private bool _isDying = false;
 
-    public event UnityAction<Cube> Dying;
+    public event UnityAction<Cube> Died;
 
-    private void OnEnable()
+    private void Awake()
     {
         _renderer = GetComponent<Renderer>();
         _rigidbody = GetComponent<Rigidbody>();
@@ -23,13 +23,13 @@ public class Cube : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (_isDying == false && collision.gameObject.TryGetComponent<CubesKiller>(out CubesKiller cubeskiller))
+        if (_isDying == false && collision.gameObject.TryGetComponent<Platform>(out Platform platform))
         {
             Die();
         }
     }
 
-    public void Init()
+    public void Init(Vector3 position)
     {
         if (_waitForDeath != null)
         {
@@ -40,13 +40,8 @@ public class Cube : MonoBehaviour
         _renderer.material.color = Color.white;
         _rigidbody.velocity = Vector3.zero;
         _rigidbody.angularVelocity = Vector3.zero;
-        _isDying = false;
-    }
-
-    public void Init(Vector3 position)
-    {
-        Init();
         transform.position = position;
+        _isDying = false;
     }
 
     public void Destroy()
@@ -71,6 +66,7 @@ public class Cube : MonoBehaviour
     {
         WaitForSeconds dyingTime = new WaitForSeconds(time);
         yield return dyingTime;
-        Dying?.Invoke(this);
+        SetActive(false);
+        Died?.Invoke(this);
     }    
 }

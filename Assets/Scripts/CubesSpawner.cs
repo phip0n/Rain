@@ -15,8 +15,8 @@ public class CubesSpawner : MonoBehaviour
     {
         _cubesPool = new ObjectPool<Cube>(
             createFunc: () => CreateCube(),
-            actionOnGet: (cube) => ActionOnGet(cube),
-            actionOnRelease: (cube) => ActionOnRelease(cube),
+            actionOnGet: (cube) => InitCube(cube),
+            actionOnRelease: (cube) => DisableCube(cube),
             actionOnDestroy: (cube) => cube.Destroy(),
             defaultCapacity: _poolSize,
             maxSize: _poolSize,
@@ -28,17 +28,17 @@ public class CubesSpawner : MonoBehaviour
         StartCoroutine(Spawn());
     }
 
-    private void ActionOnGet(Cube cube)
+    private void InitCube(Cube cube)
     {
         cube.Init(GetSpawnPosition());
-        cube.Dying += ReleaseCube;
+        cube.Died += ReleaseCube;
         cube.SetActive(true);
     }
 
-    private void ActionOnRelease(Cube cube)
+    private void DisableCube(Cube cube)
     {
-        cube.Dying -= ReleaseCube;
         cube.SetActive(false);
+        cube.Died -= ReleaseCube;
     }
 
     private Cube CreateCube()
